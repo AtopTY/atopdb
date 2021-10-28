@@ -2,19 +2,24 @@ package atopdb
 
 import (
 	"encoding/json"
-	"go.mongodb.org/mongo-driver/bson"
 	"log"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // PageParameter
 type PageParameter struct {
 	Limit  int64
 	Offset int64
+	Header int64
+	Last   int64
 }
 
 var defaultPageParameter = PageParameter{
 	Limit:  20,
 	Offset: 0,
+	Header: 0,
+	Last:   0,
 }
 
 // GetPageParameter gate page parameter form http request
@@ -23,6 +28,8 @@ func GetPageParameter(query bson.M) PageParameter {
 	var parameter PageParameter
 	parameter.Limit = getIntOr(query, "limit", defaultPageParameter.Limit)
 	parameter.Offset = getIntOr(query, "offset", defaultPageParameter.Offset)
+	parameter.Header = getIntOr(query, "header", defaultPageParameter.Header)
+	parameter.Last = getIntOr(query, "last", defaultPageParameter.Last)
 	return parameter
 }
 

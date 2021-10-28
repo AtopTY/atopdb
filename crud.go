@@ -41,25 +41,92 @@ func (d *DB) Read(c string, query bson.M) ([]bson.M, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	collection := d.db.Collection(c)
+	fmt.Println(collection.Indexes())
 	opt := options.Find()
 	opt.SetLimit(pagePara.Limit)
 	opt.SetSkip(pagePara.Offset)
-	// opt.Limit = &pagePara.Limit
+
+	//opt.Limit = &pagePara.Limit
 	// opt.Skip = &pagePara.Offset
 
 	cursor, err := collection.Find(ctx, mongoQuery, opt)
+
 	if err != nil {
 		log.Println("READ find error", err)
 		return nil, err
 	}
 	var data []bson.M
 	err = cursor.All(context.TODO(), &data)
+
+	data_filter := filter(pagePara, data)
+
 	if err != nil {
 		log.Println("READ decode error", err)
 		return nil, err
 	}
-	return data, nil
+	return data_filter, nil
 }
+
+func filter(pagePara PageParameter, data []primitive.M) []bson.M {
+	query := []bson.M{}
+	if pagePara.Header > 0 {
+		for i := 0; i < len(data); i++ {
+			if int64(i) < pagePara.Header {
+				query = append(query, data[i])
+			} else {
+				break
+			}
+		}
+		return query
+
+	} else if pagePara.Last > 0 {
+		count := pagePara.Last
+		for i := len(data) - 1; i >= 0; i-- {
+			count = count - 1
+			if (count) >= 0 {
+				query = append(query, data[i])
+			} else {
+				break
+			}
+		}
+		return query
+	} else {
+
+		return data
+	}
+}
+
+/*
+func getdata_array(pagePara PageParameter, data []primitive.M) []bson.M {
+	query := []bson.M{}
+	if pagePara.Header > 0 {
+		for i := 0; i < len(data); i++ {
+
+		}
+	}
+	return query
+}
+
+func creatindex(id string) mongo.IndexModel {
+	mod := mongo.IndexModel{
+		Keys: bson.M{
+			id: 1, // index in ascending order
+		}, Options: options.Index().SetUnique(true),
+	}
+	return mod
+}
+
+func addindex(collection *mongo.Collection, mod mongo.IndexModel) {
+
+	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+	collection.Indexes().CreateOne(ctx, mod)
+
+}
+
+func dropindex(collection *mongo.Collection, id string) {
+	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+	collection.Indexes().DropOne(ctx, id)
+}*/
 
 //UpdateID update exist document (c,q)->(pdateItem
 func (d *DB) UpdateID(c, idHex string, data bson.M) (bson.M, error) {
