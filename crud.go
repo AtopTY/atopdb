@@ -79,14 +79,11 @@ func filter(pagePara PageParameter, data []primitive.M) []bson.M {
 		}
 		return query
 
-	} else if pagePara.Last > 0 {
-		count := pagePara.Last
-		for i := len(data) - 1; i >= 0; i-- {
-			count = count - 1
-			if (count) >= 0 {
+	} else if pagePara.Last > 0 && (len(data)-int(pagePara.Last) > 0) {
+		count := len(data) - int(pagePara.Last)
+		if count > 0 {
+			for i := count; i < len(data); i++ {
 				query = append(query, data[i])
-			} else {
-				break
 			}
 		}
 		return query
