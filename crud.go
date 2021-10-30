@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -38,14 +39,14 @@ func (d *DB) FindOne(c string, mongoquery bson.M) (bson.M, error) {
 func (d *DB) Read(c string, query bson.M) ([]bson.M, error) {
 	pagePara := GetPageParameter(query)
 	mongoQuery := GetMongoQuery(query)
+	projection := GetProjection(mongoQuery)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	collection := d.db.Collection(c)
-	fmt.Println(collection.Indexes())
 	opt := options.Find()
 	opt.SetLimit(pagePara.Limit)
 	opt.SetSkip(pagePara.Offset)
-
+	opt.SetProjection(projection)
 	//opt.Limit = &pagePara.Limit
 	// opt.Skip = &pagePara.Offset
 
@@ -65,6 +66,15 @@ func (d *DB) Read(c string, query bson.M) ([]bson.M, error) {
 		return nil, err
 	}
 	return data_filter, nil
+}
+
+func GetProjection(query primitive.M) bson.M {
+	filter := bson.M{}
+	keys := reflect.ValueOf(query).MapKeys()
+	for _, k := range keys {
+		filter[k.String()] = 1
+	}
+	return filter
 }
 
 func filter(pagePara PageParameter, data []primitive.M) []bson.M {
