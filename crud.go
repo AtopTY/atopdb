@@ -74,6 +74,9 @@ func GetProjection(query primitive.M) bson.M {
 	for _, k := range keys {
 		filter[k.String()] = 1
 	}
+	if len(filter) > 0 {
+		filter["_id"] = 0
+	}
 	return filter
 }
 
