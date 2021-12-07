@@ -159,7 +159,7 @@ func (d *DB) UpdateID(c, idHex string, data bson.M) (bson.M, error) {
 }
 
 //update
-func (d *DB) UpdateInfo(c, idHex string, data bson.M) (bson.M, error) {
+func (d *DB) UpdateInfo(c string, data bson.M) (bson.M, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
