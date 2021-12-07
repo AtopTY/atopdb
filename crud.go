@@ -159,12 +159,16 @@ func (d *DB) UpdateID(c, idHex string, data bson.M) (bson.M, error) {
 }
 
 //update
-func (d *DB) UpdateInfo(c string, data bson.M) (bson.M, error) {
-
+func (d *DB) UpdateInfo(c string, idHex string, data bson.M) (bson.M, error) {
+	id, err := primitive.ObjectIDFromHex(idHex)
+	if err != nil {
+		return nil, err
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	collection := d.db.Collection(c)
 	res := collection.FindOneAndUpdate(ctx,
+		bson.M{"_id": id},
 		bson.M{"$set": data},
 		options.FindOneAndUpdate().SetUpsert(true))
 
