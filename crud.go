@@ -158,6 +158,21 @@ func (d *DB) UpdateID(c, idHex string, data bson.M) (bson.M, error) {
 	return doc, decodeErr
 }
 
+//update
+func (d *DB) UpdateInfo(c, idHex string, data bson.M) (bson.M, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	collection := d.db.Collection(c)
+	res := collection.FindOneAndUpdate(ctx,
+		bson.M{"$set": data},
+		options.FindOneAndUpdate().SetUpsert(true))
+
+	var doc = bson.M{}
+	decodeErr := res.Decode(doc)
+	return doc, decodeErr
+}
+
 // Insert (c,data)->({id:xx}) id is inserted item's id
 func (d *DB) Insert(c string, data bson.M) (bson.M, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
