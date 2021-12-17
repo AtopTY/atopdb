@@ -20,12 +20,12 @@ type DB struct {
 var instance *DB
 var once sync.Once
 
-const defaultURL string = "mongodb://localhost:27017"
+const DefaultURL string = "mongodb://localhost:27017"
 
 // GetDB get unique database pointer
 func GetDB() *DB {
 	once.Do(func() {
-		instance = initDB(defaultURL)
+		instance = initDB(DefaultURL)
 	})
 	return instance
 }
