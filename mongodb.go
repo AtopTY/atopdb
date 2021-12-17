@@ -20,7 +20,7 @@ type DB struct {
 var instance *DB
 var once sync.Once
 
-const DefaultURL string = "mongodb://localhost:27017"
+var DefaultURL string = "mongodb://localhost:27017"
 
 // GetDB get unique database pointer
 func GetDB() *DB {
