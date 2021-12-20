@@ -2,7 +2,6 @@ package atopdb
 
 import (
 	"context"
-	"crypto/sha256"
 	"fmt"
 	"time"
 
@@ -30,8 +29,10 @@ func (d *DB) ValidUser(body bson.M) (string, error) {
 	if err := colleciont.FindOne(ctx, bson.M{"name": name}).Decode(&item); err != nil {
 		return "", err
 	}
-	//	passwrod := sha256.New().Sum(body["password"])
-	body["password"] = sha256.New().Sum(body["password"])
+
+	password := []byte(body["password"].(string))
+	body["password"].sha256.New().Sum(password)
+
 	if item["password"] == body["password"] {
 		id := item["_id"].(primitive.ObjectID)
 		return id.Hex(), nil
