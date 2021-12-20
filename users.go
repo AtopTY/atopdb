@@ -32,7 +32,8 @@ func (d *DB) ValidUser(body bson.M) (string, error) {
 		return "", err
 	}
 
-	password := sha256.New().Sum([]byte(body["password"].(string)))
+	password := sha256.Sum256([]byte(body["password"].(string)))
+
 	body["password"] = hex.EncodeToString(password[:])
 
 	if item["password"] == body["password"] {
