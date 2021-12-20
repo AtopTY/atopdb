@@ -2,6 +2,8 @@ package atopdb
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -30,8 +32,8 @@ func (d *DB) ValidUser(body bson.M) (string, error) {
 		return "", err
 	}
 
-	password := []byte(body["password"].(string))
-	body["password"].sha256.New().Sum(password)
+	password := sha256.New().Sum([]byte(body["password"].(string)))
+	body["password"] = hex.EncodeToString(password[:])
 
 	if item["password"] == body["password"] {
 		id := item["_id"].(primitive.ObjectID)
