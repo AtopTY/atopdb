@@ -268,6 +268,18 @@ func (d *DB) DeleteOne(c string, idHex string) (bson.M, error) {
 	return bson.M{"count": result.DeletedCount}, nil
 }
 
+func (d *DB) Delete(c string, value string) (bson.M, error) {
+	//mongoQuery := GetMongoQuery(query)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	collection := d.db.Collection(c)
+	result, err := collection.DeleteOne(ctx, value)
+	if err != nil {
+		return bson.M{}, err
+	}
+	return bson.M{"count": result.DeletedCount}, nil
+}
+
 // DeleteMany delete by input query  (c,q)->({count:xx})
 func (d *DB) DeleteMany(c string, query bson.M) (bson.M, error) {
 	mongoQuery := GetMongoQuery(query)
