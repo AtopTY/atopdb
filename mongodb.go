@@ -21,7 +21,7 @@ var instance *DB
 var once sync.Once
 
 var defaultURL string = "mongodb://localhost:27017"
-var clientoption *options.Client = nil
+var clientoption *options.ClientOptions = nil
 
 // GetDB get unique database pointer
 func GetDB() *DB {
@@ -30,7 +30,7 @@ func GetDB() *DB {
 	})
 	return instance
 }
-func SettingOptions(option *options.Client) {
+func SettingOptions(option *options.ClientOptions) {
 	clientoption = option
 }
 
