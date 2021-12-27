@@ -20,14 +20,18 @@ type DB struct {
 var instance *DB
 var once sync.Once
 
-var DefaultURL string = "mongodb://localhost:27017"
+var defaultURL string = "mongodb://localhost:27017"
+var clientoption *options.Client = nil
 
 // GetDB get unique database pointer
 func GetDB() *DB {
 	once.Do(func() {
-		instance = initDB(DefaultURL)
+		instance = initDB(defaultURL)
 	})
 	return instance
+}
+func SettingOptions(option *options.Client) {
+	clientoption = option
 }
 
 // Initial database
@@ -35,7 +39,11 @@ func initDB(url string) *DB {
 	const defaultDatabase = "atop"
 	db := new(DB)
 	var err error
-	db.client, err = mongo.NewClient(options.Client().ApplyURI(url))
+	if clientoption == nil {
+		db.client, err = mongo.NewClient(options.Client().ApplyURI(url))
+	} else {
+		db.client, err = mongo.NewClient(clientoption)
+	}
 	if err != nil {
 		panic(err)
 	}
