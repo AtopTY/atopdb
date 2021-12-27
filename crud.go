@@ -183,6 +183,7 @@ func (d *DB) Update(c string, data bson.M) (bson.M, error) {
 	collection := d.db.Collection(c)
 	res := collection.FindOneAndUpdate(ctx,
 		bson.M{"$set": data},
+		bson.M{"$set": data},
 		options.FindOneAndUpdate().SetUpsert(true))
 
 	var doc = bson.M{}
