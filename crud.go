@@ -177,12 +177,12 @@ func (d *DB) UpdateInfo(c string, idHex string, data bson.M) (bson.M, error) {
 	return doc, decodeErr
 }
 
-func (d *DB) Update(c string, data bson.M) (bson.M, error) {
+func (d *DB) Update(c string, filter bson.M, data bson.M) (bson.M, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	collection := d.db.Collection(c)
 	res := collection.FindOneAndUpdate(ctx,
-		bson.M{"$set": data},
+		filter,
 		bson.M{"$set": data},
 		options.FindOneAndUpdate().SetUpsert(true))
 
