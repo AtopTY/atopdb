@@ -268,7 +268,7 @@ func (d *DB) DeleteOne(c string, idHex string) (bson.M, error) {
 	return bson.M{"count": result.DeletedCount}, nil
 }
 
-func (d *DB) Delete(c string, value string) (bson.M, error) {
+func (d *DB) Delete(c string, value bson.M) (bson.M, error) {
 	//mongoQuery := GetMongoQuery(query)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
